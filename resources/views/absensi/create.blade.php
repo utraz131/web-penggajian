@@ -34,6 +34,15 @@
                 <canvas id="canvas" class="hidden"></canvas>
                 <img id="photo-preview" class="hidden w-full h-full object-cover transform scale-x-[-1]" />
                 
+                <!-- Overlay Clock & Location -->
+                <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent text-white flex flex-col items-center justify-end pointer-events-none pb-6">
+                    <div id="cam-time" class="text-3xl font-bold font-mono tracking-widest drop-shadow-md mb-2">--:--:--</div>
+                    <div class="flex items-start justify-center gap-1.5 text-xs text-slate-200">
+                        <svg class="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span id="cam-location" class="text-center drop-shadow leading-relaxed">Mendeteksi lokasi...</span>
+                    </div>
+                </div>
+                
                 <!-- Loading state -->
                 <div id="camera-loading" class="absolute inset-0 flex items-center justify-center text-white bg-slate-900">
                     <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -75,13 +84,56 @@
         const btnPulang = document.getElementById('btn-absen-pulang');
         
         let stream = null;
-        let currentLat = -6.175392; // Dummy mock
-        let currentLng = 106.827153; // Dummy mock
+        let currentLat = null;
+        let currentLng = null;
 
-        // Start GPS
+        // Realtime Clock
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            const timeEl = document.getElementById('cam-time');
+            if (timeEl) timeEl.textContent = `${h}:${m}:${s}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Get Location & Address
         function getLocation() {
-            // Disabled for demo purposes so it won't trigger GPS errors
-            console.log("GPS check bypassed for demo");
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        currentLat = position.coords.latitude;
+                        currentLng = position.coords.longitude;
+                        
+                        try {
+                            // Reverse geocoding using Nominatim (OpenStreetMap)
+                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}&zoom=18&addressdetails=1`);
+                            const data = await res.json();
+                            const locEl = document.getElementById('cam-location');
+                            if (locEl) {
+                                locEl.textContent = data.display_name || `${currentLat}, ${currentLng}`;
+                            }
+                        } catch (e) {
+                            const locEl = document.getElementById('cam-location');
+                            if (locEl) locEl.textContent = `${currentLat}, ${currentLng} (Gagal mengambil nama jalan)`;
+                        }
+                    },
+                    (error) => {
+                        // Fallback ke lokasi dummy jika ditolak/error agar tetap bisa absen
+                        currentLat = -6.175392;
+                        currentLng = 106.827153;
+                        const locEl = document.getElementById('cam-location');
+                        if (locEl) locEl.textContent = "Akses lokasi ditolak. Menggunakan lokasi default.";
+                        console.error("GPS Error:", error);
+                    },
+                    { enableHighAccuracy: true }
+                );
+            } else {
+                const locEl = document.getElementById('cam-location');
+                if (locEl) locEl.textContent = "Geolocation tidak didukung browser ini.";
+            }
         }
 
         getLocation();

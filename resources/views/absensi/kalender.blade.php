@@ -6,23 +6,24 @@
 <div class="max-w-7xl mx-auto font-sans text-slate-800" id="kalender-container">
     <!-- Header Page -->
     <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-4 rounded-xl shadow-sm border border-slate-100 no-print">
-        <div class="flex items-center gap-3">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <h1 class="text-xl font-bold text-slate-900">Manajemen Absensi</h1>
+        <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <h1 class="text-lg font-bold text-slate-900">Manajemen Absensi</h1>
         </div>
-        <div class="mt-4 md:mt-0 flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-lg border border-slate-100 text-sm font-medium text-slate-600">
-            <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div class="mt-4 md:mt-0 flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded border border-slate-100 text-xs font-medium text-slate-500">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <span id="realtime-date-clock">--/--/---- --:--:--</span>
         </div>
     </div>
 
     <!-- Calendar Section -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-6">
-        <div class="flex justify-between items-center mb-6 no-print border-b border-slate-100 pb-4">
-            <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <h2 class="text-lg font-bold text-slate-800">Absensi Bulan Ini</h2>
-            </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-3 no-print">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <h2 class="text-sm font-bold text-slate-800">Absensi Bulan Ini</h2>
+                </div>
             <div class="flex items-center gap-4 text-sm font-semibold text-slate-600">
                 <a href="{{ route('kalender.index', ['month' => $currentDate->copy()->subMonth()->month, 'year' => $currentDate->copy()->subMonth()->year]) }}" class="hover:text-blue-600 transition-colors">&larr;</a>
                 <span class="w-24 text-center">{{ $currentDate->isoFormat('MMMM Y') }}</span>
@@ -106,36 +107,96 @@
         </div>
 
         <!-- Summary Badges -->
-        <div class="flex flex-wrap gap-2 text-xs font-bold text-white no-print mt-2">
-            <div class="bg-green-500 px-3 py-1.5 rounded flex items-center gap-1 shadow-sm">
-                <span>Hadir:</span> <span>{{ $summary['hadir'] }}</span>
+        <div class="flex gap-1 text-[10px] font-bold text-white no-print mt-2">
+            <div class="bg-green-500 px-2 py-1 rounded-md shadow-sm">
+                Hadir: {{ $summary['hadir'] }}
             </div>
-            <div class="bg-orange-500 px-3 py-1.5 rounded flex items-center gap-1 shadow-sm">
-                <span>Telat:</span> <span>{{ $summary['telat'] }}</span>
+            <div class="bg-orange-500 px-2 py-1 rounded-md shadow-sm">
+                Telat: {{ $summary['telat'] }}
             </div>
-            <div class="bg-red-500 px-3 py-1.5 rounded flex items-center gap-1 shadow-sm">
-                <span>Alpha:</span> <span>{{ $summary['alfa'] }}</span>
+            <div class="bg-red-500 px-2 py-1 rounded-md shadow-sm">
+                Alpha: {{ $summary['alfa'] }}
             </div>
-            <div class="bg-blue-500 px-3 py-1.5 rounded flex items-center gap-1 shadow-sm">
-                <span>Izin:</span> <span>{{ $summary['izin'] }}</span>
+            <div class="bg-blue-500 px-2 py-1 rounded-md shadow-sm">
+                Izin: {{ $summary['izin'] }}
             </div>
-            <div class="bg-yellow-500 px-3 py-1.5 rounded flex items-center gap-1 shadow-sm">
-                <span>Sakit:</span> <span>{{ $summary['sakit'] }}</span>
+            <div class="bg-yellow-500 px-2 py-1 rounded-md shadow-sm">
+                Sakit: {{ $summary['sakit'] }}
             </div>
         </div>
+        </div>
+        <!-- Right empty space for the grid -->
+        <div></div>
     </div>
 
     <!-- Daftar Absensi List Section -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 no-print">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-4 mb-6">
-            <h2 class="text-lg font-bold text-slate-800">Daftar Absensi</h2>
-            <a href="{{ route('absensi.create') }}" class="mt-4 md:mt-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2 text-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-3 mb-4">
+            <h2 class="text-base font-bold text-slate-800">Daftar Absensi</h2>
+            <a href="{{ route('absensi.create') }}" class="mt-4 md:mt-0 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded shadow-sm transition-colors flex items-center gap-1.5 text-xs">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Input Absensi Saya
             </a>
         </div>
         
-        <div class="overflow-x-auto">
+        <!-- Filters (UI Only) -->
+        <div class="flex flex-wrap gap-4 mb-4 text-xs">
+            <div class="flex flex-col gap-1 w-full md:w-auto flex-1 md:min-w-[200px]">
+                <label class="text-slate-500 font-medium">Cari Karyawan</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="text" class="w-full pl-7 pr-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500" placeholder="Nama atau NIP...">
+                </div>
+            </div>
+            <div class="flex flex-col gap-1 w-full md:w-32">
+                <label class="text-slate-500 font-medium">Status</label>
+                <select class="w-full px-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500 text-slate-700">
+                    <option>Semua Status</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-1 w-full md:w-32">
+                <label class="text-slate-500 font-medium">Bulan</label>
+                <select class="w-full px-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500 text-slate-700">
+                    <option>Semua Bulan</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-1 w-full md:w-32">
+                <label class="text-slate-500 font-medium">Tahun</label>
+                <select class="w-full px-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500 text-slate-700">
+                    <option>Semua Tahun</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-1 w-full md:w-32">
+                <label class="text-slate-500 font-medium">Urutkan</label>
+                <select class="w-full px-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500 text-slate-700">
+                    <option>Tanggal</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-1 w-full md:w-24">
+                <label class="text-slate-500 font-medium">Arah</label>
+                <select class="w-full px-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500 text-slate-700">
+                    <option>&uarr;</option>
+                    <option>&darr;</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="flex gap-2 mb-4">
+            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                Cari
+            </button>
+            <button class="px-3 py-1.5 bg-slate-500 hover:bg-slate-600 text-white rounded text-xs font-medium flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Reset
+            </button>
+        </div>
+        
+        <p class="text-xs text-slate-500 mb-2">Menampilkan {{ count($daftarAbsensi) }} data absensi</p>
+        
+        <div class="overflow-x-auto border-t border-slate-100 pt-2">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-200">

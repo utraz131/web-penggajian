@@ -53,6 +53,8 @@ Route::middleware(['auth'])->group(function () {
     // Atasan Access
     Route::middleware(['role:atasan'])->group(function () {
         // Run Payroll pages (Wizard)
+        Route::get('/penggajian/manual', [PenggajianController::class, 'createManual'])->name('penggajian.manual');
+        Route::post('/penggajian/manual', [PenggajianController::class, 'storeManual'])->name('penggajian.storeManual');
         Route::get('/penggajian/create', [PenggajianController::class, 'create'])->name('penggajian.create'); // Step 1
         Route::post('/penggajian/preview', [PenggajianController::class, 'preview'])->name('penggajian.preview'); // Step 2
         Route::post('/penggajian/store', [PenggajianController::class, 'store'])->name('penggajian.store'); // Step 3

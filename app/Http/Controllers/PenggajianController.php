@@ -29,6 +29,52 @@ class PenggajianController extends Controller
         return view('penggajian.step1');
     }
 
+    // Menampilkan Form Gaji Manual
+    public function createManual()
+    {
+        $pegawais = Pegawai::where('status', 'Aktif')->get();
+        return view('penggajian.manual', compact('pegawais'));
+    }
+
+    // Menyimpan Gaji Manual
+    public function storeManual(Request $request)
+    {
+        $request->validate([
+            'pegawai_id' => 'required|exists:pegawais,id',
+            'bulan_tahun' => 'required|string',
+            'jumlah_hadir' => 'required|integer|min:0',
+            'gaji_pokok' => 'required|numeric|min:0',
+            'tunjangan' => 'required|numeric|min:0',
+            'potongan_absen' => 'required|numeric|min:0',
+            'potongan_bpjs' => 'required|numeric|min:0',
+            'potongan_pajak' => 'required|numeric|min:0',
+            'total_gaji' => 'required|numeric|min:0',
+        ]);
+
+        // Format bulan_tahun dari Y-m (cth: 2026-07) menjadi F Y (cth: July 2026)
+        $formatted_bulan = \Carbon\Carbon::createFromFormat('Y-m', $request->bulan_tahun)->format('F Y');
+
+        // Cek apakah data gaji bulan ini sudah ada
+        if (Penggajian::where('pegawai_id', $request->pegawai_id)
+            ->where('bulan_tahun', $formatted_bulan)->exists()) {
+            return back()->withInput()->with('error', 'Gaji untuk karyawan ini pada periode tersebut sudah ada.');
+        }
+
+        Penggajian::create([
+            'pegawai_id' => $request->pegawai_id,
+            'bulan_tahun' => $formatted_bulan,
+            'jumlah_hadir' => $request->jumlah_hadir,
+            'gaji_pokok' => $request->gaji_pokok,
+            'tunjangan' => $request->tunjangan,
+            'potongan_absen' => $request->potongan_absen,
+            'potongan_bpjs' => $request->potongan_bpjs,
+            'potongan_pajak' => $request->potongan_pajak,
+            'total_gaji' => $request->total_gaji,
+        ]);
+
+        return redirect()->route('penggajian.index')->with('success', 'Gaji manual berhasil disimpan!');
+    }
+
     // Langkah 2: Preview Perhitungan Gaji
     public function preview(Request $request)
     {
