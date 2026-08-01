@@ -117,8 +117,8 @@ class DemoSeeder extends Seeder
             }
         }
 
-        // 3. Generate Penggajian (2 Bulan Terakhir) untuk SEMUA Pegawai
-        for ($m = 2; $m >= 1; $m--) {
+        // 3. Generate Penggajian (Hanya 2 bulan lalu, bulan lalu dikosongkan untuk demo live)
+        for ($m = 2; $m >= 2; $m--) {
             $bulan = date('F Y', strtotime("-$m month"));
             
             foreach ($pegawais as $pegawai) {

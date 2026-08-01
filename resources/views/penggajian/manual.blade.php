@@ -47,7 +47,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Periode (Bulan & Tahun) <span class="text-red-500">*</span></label>
-                    <input type="month" name="bulan_tahun" id="bulan_tahun" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" required value="{{ date('Y-m') }}">
+                    <input type="month" name="bulan_tahun" id="bulan_tahun" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" required value="{{ $default_month ?? date('Y-m') }}">
                 </div>
             </div>
 
@@ -113,7 +113,27 @@
         const selectPegawai = document.getElementById('pegawai_id');
         const inGajiPokok = document.getElementById('gaji_pokok');
         const inTunjangan = document.getElementById('tunjangan');
+        const inJumlahHadir = document.getElementById('jumlah_hadir');
+        const inputBulanTahun = document.getElementById('bulan_tahun');
         
+        function fetchAttendanceStats() {
+            const pegawai_id = selectPegawai.value;
+            const bulan_tahun = inputBulanTahun.value;
+            
+            if (pegawai_id && bulan_tahun) {
+                fetch(`/penggajian/manual/stats?pegawai_id=${pegawai_id}&bulan_tahun=${bulan_tahun}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        inJumlahHadir.value = data.jumlah_hadir || 0;
+                        calculateTotal();
+                    })
+                    .catch(err => console.error(err));
+            } else {
+                inJumlahHadir.value = 0;
+                calculateTotal();
+            }
+        }
+
         // Auto-fill Gaji Pokok & Tunjangan when selecting pegawai
         selectPegawai.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
@@ -122,13 +142,14 @@
                 const tunj = selectedOption.getAttribute('data-tunjangan') || 0;
                 inGajiPokok.value = gp;
                 inTunjangan.value = tunj;
-                calculateTotal();
             } else {
                 inGajiPokok.value = 0;
                 inTunjangan.value = 0;
-                calculateTotal();
             }
+            fetchAttendanceStats();
         });
+
+        inputBulanTahun.addEventListener('change', fetchAttendanceStats);
 
         // Calculate Total
         const calcInputs = document.querySelectorAll('.calc-input');

@@ -30,10 +30,16 @@ class PenggajianController extends Controller
     }
 
     // Menampilkan Form Gaji Manual
-    public function createManual()
+    public function createManual(Request $request)
     {
         $pegawais = Pegawai::where('status', 'Aktif')->get();
-        return view('penggajian.manual', compact('pegawais'));
+        $default_month = date('Y-m');
+        if ($request->has('bulan_tahun')) {
+            try {
+                $default_month = \Carbon\Carbon::createFromFormat('F Y', $request->bulan_tahun)->format('Y-m');
+            } catch (\Exception $e) {}
+        }
+        return view('penggajian.manual', compact('pegawais', 'default_month'));
     }
 
     // Menyimpan Gaji Manual
@@ -73,6 +79,32 @@ class PenggajianController extends Controller
         ]);
 
         return redirect()->route('penggajian.index')->with('success', 'Gaji manual berhasil disimpan!');
+    }
+
+    public function getAbsensiStats(Request $request)
+    {
+        $pegawai_id = $request->pegawai_id;
+        $bulan_tahun = $request->bulan_tahun;
+
+        if (!$pegawai_id || !$bulan_tahun) {
+            return response()->json(['jumlah_hadir' => 0]);
+        }
+
+        try {
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $bulan_tahun);
+            $month = $date->month;
+            $year = $date->year;
+
+            $jumlah_hadir = \App\Models\Absensi::where('pegawai_id', $pegawai_id)
+                ->whereMonth('tanggal', $month)
+                ->whereYear('tanggal', $year)
+                ->whereNotNull('waktu_masuk')
+                ->count();
+
+            return response()->json(['jumlah_hadir' => $jumlah_hadir]);
+        } catch (\Exception $e) {
+            return response()->json(['jumlah_hadir' => 0]);
+        }
     }
 
     // Langkah 2: Preview Perhitungan Gaji

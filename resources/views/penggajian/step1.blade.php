@@ -50,7 +50,7 @@
             @csrf
             <div class="mb-6 text-left">
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Periode (Bulan/Tahun)</label>
-                <select name="bulan_tahun" class="w-full px-4 py-3 border border-slate-200 rounded-lg text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500" required>
+                <select name="bulan_tahun" id="pilih_bulan" class="w-full px-4 py-3 border border-slate-200 rounded-lg text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500" required>
                     @for ($i = -3; $i <= 1; $i++)
                         @php $val = date('F Y', strtotime("$i month")); @endphp
                         <option value="{{ $val }}" {{ $i == -1 ? 'selected' : '' }}>{{ $val }}</option>
@@ -69,7 +69,7 @@
                 <div class="flex-grow border-t border-slate-200"></div>
             </div>
             
-            <a href="{{ route('penggajian.manual') }}" class="mt-2 w-full py-2.5 bg-white border border-slate-300 text-slate-700 font-semibold rounded-lg shadow-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors">
+            <a href="#" onclick="window.location.href='{{ route('penggajian.manual') }}?bulan_tahun=' + encodeURIComponent(document.getElementById('pilih_bulan').value)" class="mt-2 w-full py-2.5 bg-white border border-slate-300 text-slate-700 font-semibold rounded-lg shadow-sm flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                 Input Gaji Manual (Satu Per Satu)
             </a>
