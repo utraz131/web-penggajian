@@ -16,6 +16,8 @@ class DemoSeeder extends Seeder
 {
     public function run()
     {
+        // Tidak pakai seed global, kita set seed per pegawai di bawah
+
         // Bersihkan data riwayat LAMA saja (agar absen hari ini tidak terhapus)
         // Kita hanya menghapus riwayat gaji, cuti, dan absen yang tanggalnya sebelum hari ini
         $today = Carbon::today()->toDateString();
@@ -51,6 +53,10 @@ class DemoSeeder extends Seeder
 
         // 2. Generate Riwayat Absensi & Cuti (3 Bulan Terakhir sampai kemarin) untuk SEMUA Pegawai
         foreach ($pegawais as $pegawai) {
+            // Re-seed PRNG secara spesifik per pegawai agar datanya 100% konsisten
+            // dan tidak bergeser meskipun urutan/jumlah pegawai berubah
+            mt_srand(crc32($pegawai->nama . 'rexycorp'));
+
             // Jika pegawai belum punya User account, buatin (password: password)
             if (!User::where('pegawai_id', $pegawai->id)->exists()) {
                 // Hindari duplikat email
@@ -76,8 +82,10 @@ class DemoSeeder extends Seeder
 
                 $rand = rand(1, 100);
                 
-                if ($rand <= 85) {
-                    // 85% Hadir
+                // Bikin variasi kehadiran lebih menyebar, supaya gak semuanya dapet 20-22 hari
+                // Misal: 70% Hadir Tepat Waktu, 15% Terlambat, 15% Alfa/Izin
+                if ($rand <= 70) {
+                    // 70% Hadir
                     Absensi::create([
                         'pegawai_id' => $pegawai->id,
                         'tanggal' => $start->toDateString(),
@@ -86,8 +94,8 @@ class DemoSeeder extends Seeder
                         'status' => 'Hadir',
                         'created_at' => $start
                     ]);
-                } elseif ($rand <= 95) {
-                    // 10% Terlambat
+                } elseif ($rand <= 85) {
+                    // 15% Terlambat
                     Absensi::create([
                         'pegawai_id' => $pegawai->id,
                         'tanggal' => $start->toDateString(),
@@ -97,9 +105,9 @@ class DemoSeeder extends Seeder
                         'created_at' => $start
                     ]);
                 } else {
-                    // 5% Alfa (Tidak absen)
-                    // 1 dari 5 kemungkinan Alfa sebenarnya adalah Cuti/Izin/Sakit yang di acc
-                    if (rand(1, 5) == 1) {
+                    // 15% Alfa (Tidak absen)
+                    // Sepertiganya adalah Cuti/Izin/Sakit yang di acc
+                    if (rand(1, 3) == 1) {
                         $jenisList = ['Izin', 'Cuti', 'Sakit'];
                          IzinCuti::create([
                              'pegawai_id' => $pegawai->id,
@@ -117,13 +125,15 @@ class DemoSeeder extends Seeder
             }
         }
 
+
         // 3. Generate Penggajian (Hanya 2 bulan lalu, bulan lalu dikosongkan untuk demo live)
         for ($m = 2; $m >= 2; $m--) {
             $bulan = date('F Y', strtotime("-$m month"));
             
             foreach ($pegawais as $pegawai) {
+                mt_srand(crc32($pegawai->nama . $bulan));
                 // Potongan acak biar riwayatnya kelihatan bervariasi
-                $potonganAbsen = rand(0, 2) * 50000;
+                $potonganAbsen = rand(0, 10) * 25000;
                 $potonganBpjs = 50000;
                 
                 $total_pendapatan = $pegawai->gaji_pokok + $pegawai->tunjangan;
@@ -134,7 +144,7 @@ class DemoSeeder extends Seeder
                 Penggajian::create([
                     'pegawai_id' => $pegawai->id,
                     'bulan_tahun' => $bulan,
-                    'jumlah_hadir' => rand(18, 22),
+                    'jumlah_hadir' => rand(12, 22),
                     'gaji_pokok' => $pegawai->gaji_pokok,
                     'tunjangan' => $pegawai->tunjangan,
                     'potongan_absen' => $potonganAbsen,
