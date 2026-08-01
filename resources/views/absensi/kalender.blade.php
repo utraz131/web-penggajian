@@ -139,60 +139,7 @@
             </a>
         </div>
         
-        <!-- Filters (UI Only) -->
-        <div class="flex flex-wrap gap-4 mb-4 text-xs">
-            <div class="flex flex-col gap-1 w-full md:w-auto flex-1 md:min-w-[200px]">
-                <label class="text-slate-500 font-medium">Cari Karyawan</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                    <input type="text" class="w-full pl-7 pr-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500" placeholder="Nama atau NIP...">
-                </div>
-            </div>
-            <div class="flex flex-col gap-1 w-full md:w-32">
-                <label class="text-slate-500 font-medium">Status</label>
-                <select class="w-full px-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500 text-slate-700">
-                    <option>Semua Status</option>
-                </select>
-            </div>
-            <div class="flex flex-col gap-1 w-full md:w-32">
-                <label class="text-slate-500 font-medium">Bulan</label>
-                <select class="w-full px-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500 text-slate-700">
-                    <option>Semua Bulan</option>
-                </select>
-            </div>
-            <div class="flex flex-col gap-1 w-full md:w-32">
-                <label class="text-slate-500 font-medium">Tahun</label>
-                <select class="w-full px-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500 text-slate-700">
-                    <option>Semua Tahun</option>
-                </select>
-            </div>
-            <div class="flex flex-col gap-1 w-full md:w-32">
-                <label class="text-slate-500 font-medium">Urutkan</label>
-                <select class="w-full px-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500 text-slate-700">
-                    <option>Tanggal</option>
-                </select>
-            </div>
-            <div class="flex flex-col gap-1 w-full md:w-24">
-                <label class="text-slate-500 font-medium">Arah</label>
-                <select class="w-full px-2 py-1.5 border border-slate-200 rounded focus:outline-none focus:border-blue-500 text-slate-700">
-                    <option>&uarr;</option>
-                    <option>&darr;</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="flex gap-2 mb-4">
-            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                Cari
-            </button>
-            <button class="px-3 py-1.5 bg-slate-500 hover:bg-slate-600 text-white rounded text-xs font-medium flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                Reset
-            </button>
-        </div>
+
         
         <p class="text-xs text-slate-500 mb-2">Menampilkan {{ count($daftarAbsensi) }} data absensi</p>
         
@@ -200,7 +147,6 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-200">
-                        <th class="py-3 px-4">Karyawan</th>
                         <th class="py-3 px-4">Tanggal</th>
                         <th class="py-3 px-4">Jam Masuk</th>
                         <th class="py-3 px-4">Jam Keluar</th>
@@ -210,10 +156,6 @@
                 <tbody class="text-sm text-slate-700 divide-y divide-slate-100">
                     @forelse($daftarAbsensi as $absensi)
                     <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="py-3 px-4">
-                            <div class="font-medium text-slate-900">{{ Auth::user()->pegawai->nama_lengkap ?? Auth::user()->name }}</div>
-                            <div class="text-xs text-slate-500">{{ Auth::user()->pegawai->nip ?? '' }}</div>
-                        </td>
                         <td class="py-3 px-4 font-medium">{{ \Carbon\Carbon::parse($absensi->tanggal)->isoFormat('D MMMM Y') }}</td>
                         <td class="py-3 px-4">
                             @if($absensi->waktu_masuk)
@@ -243,7 +185,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="py-8 text-center text-slate-500">Tidak ada data absensi di bulan ini.</td>
+                        <td colspan="4" class="py-8 text-center text-slate-500">Tidak ada data absensi di bulan ini.</td>
                     </tr>
                     @endforelse
                 </tbody>

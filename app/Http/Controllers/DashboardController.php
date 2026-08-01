@@ -114,12 +114,7 @@ class DashboardController extends Controller
                 break;
             }
 
-            // Lewati hari Sabtu (6) dan Minggu (0) jika perusahaan libur weekend.
-            // Asumsi 5 hari kerja (Senin-Jumat). Jika 7 hari, hapus kondisi ini.
-            if ($date->isWeekend()) {
-                continue;
-            }
-            
+            // Cek data absen hari tersebut terlebih dahulu
             $dateString = $date->toDateString();
             $absen = \App\Models\Absensi::where('pegawai_id', $pegawai->id)
                         ->where('tanggal', $dateString)
@@ -128,6 +123,11 @@ class DashboardController extends Controller
             if ($absen) {
                 $riwayatAbsen[] = $absen;
             } else {
+                // Jika tidak ada absen dan hari ini weekend, lewati saja (tidak dicatat sebagai Alfa)
+                if ($date->isWeekend()) {
+                    continue;
+                }
+
                 // Cek apakah ada cuti/izin di hari itu
                 $cuti = \App\Models\IzinCuti::where('pegawai_id', $pegawai->id)
                     ->where('status', 'Disetujui')
