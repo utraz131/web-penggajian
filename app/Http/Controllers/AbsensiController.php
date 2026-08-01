@@ -42,7 +42,9 @@ class AbsensiController extends Controller
         $absensiBulanIni = Absensi::where('pegawai_id', $pegawai->id)
                                 ->whereBetween('tanggal', [$currentMonthStart->toDateString(), $currentMonthEnd->toDateString()])
                                 ->get()
-                                ->keyBy('tanggal');
+                                ->keyBy(function($item) {
+                                    return \Carbon\Carbon::parse($item->tanggal)->toDateString();
+                                });
         
         $cutiBulanIni = \App\Models\IzinCuti::where('pegawai_id', $pegawai->id)
                                 ->where('status', 'Disetujui')
@@ -70,51 +72,47 @@ class AbsensiController extends Controller
             $waktuKeluar = '--:--';
             $keterangan = '';
             
-            if ($date->isWeekend()) {
-                $statusKalender = 'libur';
-            } elseif ($date->gt(Carbon::today())) {
-                $statusKalender = 'belum';
-            } elseif ($pegawai->created_at && $date->lt($pegawai->created_at->startOfDay())) {
-                $statusKalender = 'belum';
+            if ($absensiBulanIni->has($dateStr)) {
+                $absenDay = $absensiBulanIni->get($dateStr);
+                $waktuMasuk = $absenDay->waktu_masuk ? substr($absenDay->waktu_masuk, 0, 5) : '--:--';
+                $waktuKeluar = $absenDay->waktu_keluar ? substr($absenDay->waktu_keluar, 0, 5) : '--:--';
+                
+                if (stripos($absenDay->status, 'Terlambat') !== false || stripos($absenDay->keterangan, 'Terlambat') !== false) {
+                    $statusKalender = 'telat';
+                    $keterangan = 'Terlambat';
+                } elseif ($absenDay->status == 'Hadir') {
+                    $statusKalender = 'hadir';
+                } elseif ($absenDay->status == 'Alfa') {
+                    $statusKalender = 'alfa';
+                } else {
+                    $statusKalender = 'hadir';
+                }
             } else {
-                if ($absensiBulanIni->has($dateStr)) {
-                    $absenDay = $absensiBulanIni->get($dateStr);
-                    $waktuMasuk = $absenDay->waktu_masuk ? substr($absenDay->waktu_masuk, 0, 5) : '--:--';
-                    $waktuKeluar = $absenDay->waktu_keluar ? substr($absenDay->waktu_keluar, 0, 5) : '--:--';
-                    
-                    if (stripos($absenDay->status, 'Terlambat') !== false || stripos($absenDay->keterangan, 'Terlambat') !== false) {
-                        $statusKalender = 'telat';
-                        $keterangan = 'Terlambat';
-                    } elseif ($absenDay->status == 'Hadir') {
-                        $statusKalender = 'hadir';
-                    } elseif ($absenDay->status == 'Alfa') {
-                        $statusKalender = 'alfa';
+                $isCuti = false;
+                $jenisCuti = 'izin';
+                foreach($cutiBulanIni as $cuti) {
+                    if ($dateStr >= $cuti->tanggal_mulai && $dateStr <= $cuti->tanggal_selesai) {
+                        $isCuti = true;
+                        $keterangan = $cuti->alasan;
+                        $jenisCuti = strtolower($cuti->jenis); // e.g. sakit, izin, cuti
+                        break;
+                    }
+                }
+                if ($isCuti) {
+                    if (strpos($jenisCuti, 'sakit') !== false) {
+                        $statusKalender = 'sakit';
                     } else {
-                        $statusKalender = 'hadir';
+                        $statusKalender = 'izin';
                     }
                 } else {
-                    $isCuti = false;
-                    $jenisCuti = 'izin';
-                    foreach($cutiBulanIni as $cuti) {
-                        if ($dateStr >= $cuti->tanggal_mulai && $dateStr <= $cuti->tanggal_selesai) {
-                            $isCuti = true;
-                            $keterangan = $cuti->alasan;
-                            $jenisCuti = strtolower($cuti->jenis); // e.g. sakit, izin, cuti
-                            break;
-                        }
-                    }
-                    if ($isCuti) {
-                        if (strpos($jenisCuti, 'sakit') !== false) {
-                            $statusKalender = 'sakit';
-                        } else {
-                            $statusKalender = 'izin';
-                        }
+                    if ($date->isWeekend()) {
+                        $statusKalender = 'libur';
+                    } elseif ($date->gt(Carbon::today())) {
+                        $statusKalender = 'belum';
+                    } elseif ($date->lt(Carbon::today())) {
+                        $statusKalender = 'alfa';
                     } else {
-                        if ($date->lt(Carbon::today())) {
-                            $statusKalender = 'alfa';
-                        } else {
-                            $statusKalender = 'belum';
-                        }
+                        $statusKalender = 'belum';
                     }
                 }
             }
