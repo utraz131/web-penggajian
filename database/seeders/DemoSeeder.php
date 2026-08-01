@@ -125,9 +125,11 @@ class DemoSeeder extends Seeder
                 // Potongan acak biar riwayatnya kelihatan bervariasi
                 $potonganAbsen = rand(0, 2) * 50000;
                 $potonganBpjs = 50000;
-                $potonganPajak = 0;
                 
-                $totalGaji = $pegawai->gaji_pokok + $pegawai->tunjangan - $potonganAbsen - $potonganBpjs - $potonganPajak;
+                $total_pendapatan = $pegawai->gaji_pokok + $pegawai->tunjangan;
+                $potonganPajak = $total_pendapatan > 5000000 ? ($total_pendapatan * 0.05) : 0;
+                
+                $totalGaji = $total_pendapatan - $potonganAbsen - $potonganBpjs - $potonganPajak;
 
                 Penggajian::create([
                     'pegawai_id' => $pegawai->id,
