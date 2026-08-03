@@ -124,7 +124,7 @@ class PenggajianController extends Controller
 
         foreach ($pegawais as $pegawai) {
             // Skip pegawai yang baru bergabung setelah bulan penggajian ini
-            $penggajianDate = \Carbon\Carbon::createFromFormat('Y-m', $bulan_tahun)->endOfMonth();
+            $penggajianDate = \Carbon\Carbon::createFromDate($year, $month, 1)->endOfMonth();
             if ($pegawai->created_at && $pegawai->created_at->startOfDay()->gt($penggajianDate)) {
                 continue;
             }
@@ -214,7 +214,7 @@ class PenggajianController extends Controller
             if (!$pegawai) continue;
             
             // Skip pegawai yang baru bergabung setelah bulan penggajian ini
-            $penggajianDate = \Carbon\Carbon::createFromFormat('Y-m', $bulan_tahun)->endOfMonth();
+            $penggajianDate = \Carbon\Carbon::createFromDate($year, $month, 1)->endOfMonth();
             if ($pegawai->created_at && $pegawai->created_at->startOfDay()->gt($penggajianDate)) {
                 continue;
             }

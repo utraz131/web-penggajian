@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'Aktif',
             'gaji_pokok' => 5000000,
             'tunjangan' => 1000000,
+            'created_at' => \Carbon\Carbon::now()->subMonths(6),
         ]);
 
         User::create([
@@ -59,6 +60,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'Aktif',
             'gaji_pokok' => 5000000,
             'tunjangan' => 1000000,
+            'created_at' => \Carbon\Carbon::now()->subMonths(6),
         ]);
 
         User::create([
@@ -77,6 +79,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'Aktif',
             'gaji_pokok' => 5000000,
             'tunjangan' => 1000000,
+            'created_at' => \Carbon\Carbon::now()->subMonths(6),
         ]);
 
         User::create([
