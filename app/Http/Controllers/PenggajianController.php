@@ -123,6 +123,12 @@ class PenggajianController extends Controller
         $year = date('Y', strtotime($bulan_tahun));
 
         foreach ($pegawais as $pegawai) {
+            // Skip pegawai yang baru bergabung setelah bulan penggajian ini
+            $penggajianDate = \Carbon\Carbon::createFromFormat('Y-m', $bulan_tahun)->endOfMonth();
+            if ($pegawai->created_at && $pegawai->created_at->startOfDay()->gt($penggajianDate)) {
+                continue;
+            }
+
             // Skip jika sudah ada penggajian
             if (Penggajian::where('pegawai_id', $pegawai->id)->where('bulan_tahun', $bulan_tahun)->exists()) {
                 continue;
@@ -207,6 +213,12 @@ class PenggajianController extends Controller
             $pegawai = Pegawai::find($pegawai_id);
             if (!$pegawai) continue;
             
+            // Skip pegawai yang baru bergabung setelah bulan penggajian ini
+            $penggajianDate = \Carbon\Carbon::createFromFormat('Y-m', $bulan_tahun)->endOfMonth();
+            if ($pegawai->created_at && $pegawai->created_at->startOfDay()->gt($penggajianDate)) {
+                continue;
+            }
+
             if (Penggajian::where('pegawai_id', $pegawai_id)->where('bulan_tahun', $bulan_tahun)->exists()) {
                 continue;
             }
